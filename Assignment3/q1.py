@@ -35,6 +35,14 @@ def data_exploration(X, y):
     """
     # TODO : write your code here
 
+    n_records = len(X)
+    n_subscriber = len(X['y' == 'yes'])
+
+    if n_records > 0:
+        subscriber_percent = (n_records/n_subscriber)*100
+    else:
+        subscriber_percent = 0
+
     return n_records, n_subscriber, subscriber_percent
 
 def feature_encoding(X):
@@ -45,6 +53,10 @@ def feature_encoding(X):
     """
     non_numerical_columns_names = X.select_dtypes(exclude=['number']).columns
     # TODO : write encoding here
+    le = LabelEncoder()
+
+    for category_name in non_numerical_columns_names:
+        X[category_name] = le.fit_transform(X[category_name])
 
     return X
 
@@ -56,6 +68,11 @@ def encode_label(y):
     Output: y: labels_int (pd.DataFrame) with shape = (45211, 1)
     """
     # TODO : write encoding here
+    le = LabelEncoder()
+
+    print('y label')
+    print(y)
+    y['y'] = le.fit_transform(y['y'])
 
     return y
 

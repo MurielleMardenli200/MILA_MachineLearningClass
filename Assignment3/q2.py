@@ -1,12 +1,12 @@
 from sklearn.model_selection import train_test_split
-from q1_question import data_preprocessing
+from q1 import data_preprocessing
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import f1_score, accuracy_score
 from sklearn.metrics import classification_report, confusion_matrix
-
+import pandas as pd
 
 def data_splits(X, y):
     """
@@ -15,7 +15,16 @@ def data_splits(X, y):
     Output(s): X_train, X_test, y_train, y_test
     """
     # Use random_state = 0 in the train_test_split
-    # TODO write data split here
+    print('X train columns')
+    print(X.columns)
+    # X = X.drop(columns=['y'])
+    print('AFTER X train columns')
+    print(X.columns)
+
+    if 'y' in X.columns:
+        X = X.drop(columns=['y']) 
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
     return X_train, X_test, y_train, y_test
 
@@ -26,7 +35,13 @@ def normalize_features(X_train, X_test):
     Input: X_train: features for train,  X_test: features for test (pd.DataFrame)
     Output: X_train_scaled, X_test_scaled (pd.DataFrame) the same shape of X_train and X_test
     """
-    # TODO write normalization here
+
+    scaler = MinMaxScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_train_scaled = pd.DataFrame(X_train_scaled, columns=X_train.columns)
+
+    X_test_scaled = scaler.transform(X_test)
+    X_test_scaled = pd.DataFrame(X_test_scaled, columns=X_test.columns)
 
     return X_train_scaled, X_test_scaled
 
@@ -40,13 +55,13 @@ def train_model(model_name, X_train_scaled, y_train):
     output: cls: the trained model
     '''
     if model_name == 'Decision Tree':
-        cls = ... # TODO call classifier here
+        cls = DecisionTreeClassifier(random_state=0)
     elif model_name == 'Random Forest':
-        cls = ... # TODO call classifier here
+        cls = RandomForestClassifier(random_state=0)
     elif model_name == 'SVM':
-        cls = ... # TODO call classifier here
+        cls = SVC(random_state=0)
 
-    ... # TODO trian the model
+    cls.fit(X_train_scaled, y_train)
 
     return cls
 
@@ -78,7 +93,7 @@ def eval_model(trained_models, X_train, X_test, y_train, y_test):
     for model_name, model in trained_models.items():
         # Predictions for training and testing sets
         y_train_pred = ... # TODO predict y
-        y_test_pred = . .. # TODO predict y
+        y_test_pred = ... # TODO predict y
 
         # Calculate accuracy
         train_accuracy = ... # TODO find accuracy
@@ -93,12 +108,12 @@ def eval_model(trained_models, X_train, X_test, y_train, y_test):
         y_test_pred_dict[model_name] = ... # TODO
 
         # Store the evaluation metrics
-        evaluation_results[model_name] = {
-            'Train Accuracy': ... # TODO ,
-            'Test Accuracy': ...  # TODO ,
-            'Train F1 Score': ... # TODO ,
-            'Test F1 Score': ...  # TODO
-        }
+        # evaluation_results[model_name] = {
+        #     'Train Accuracy': ... # TODO ,
+        #     'Test Accuracy': ...  # TODO ,
+        #     'Train F1 Score': ... # TODO ,
+        #     'Test F1 Score': ...  # TODO
+        # }
 
     # Return the evaluation results
     return y_train_pred_dict, y_test_pred_dict, evaluation_results
@@ -139,13 +154,13 @@ def report_model(y_train, y_test, y_train_pred_dict, y_test_pred_dict):
 
 
 
-X, y = ... # TODO call data preprocessing from q1
-X_train, X_test, y_train, y_test = ... # TODO split data
-X_train_scaled, X_test_scaled = ... # TODO normalize data
+X, y = data_preprocessing()
+X_train, X_test, y_train, y_test = data_splits(X, y)
+X_train_scaled, X_test_scaled = normalize_features(X_train, X_test)
 
-cls_decision_tree = ... # TODO train the model
-cls_randomforest = ... # TODO train the model
-cls_svm = ... # TODO train the model
+cls_decision_tree = train_model('Decision Tree', X_train_scaled, y_train)
+cls_randomforest = train_model('Random Forest', X_train_scaled, y_train)
+cls_svm = train_model('SVM', X_train_scaled, y_train)
 
 # Define a dictionary of model name and their trained model
 trained_models = {
@@ -158,22 +173,4 @@ y_train_pred_dict, y_test_pred_dict, evaluation_results = eval_model(trained_mod
 
 # classification report and calculate confusion matrix
 report_model(y_train, y_test, y_train_pred_dict, y_test_pred_dict)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
