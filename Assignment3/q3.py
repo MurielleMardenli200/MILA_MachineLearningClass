@@ -8,22 +8,31 @@ from q1 import data_preprocessing
 from q2 import data_splits, normalize_features
 
 # Step 1: Create smaller hyperparameter grids for each model
+
+#  (3 points) Create a dictionary of the specified parameters below for each models with a good range of values. Here are the parameters for each model:
+# 1. Decision-Trees:criterion, max depth, min sample leaf, max leaf nodes
+# 2. Random-Forest: n estimators, max depth, bootstrap
+# 3. SVM: kernel, shrinking, C(Regularization parameter), tolerance, gamma
+
 param_grid_decision_tree = {
     'criterion': ['gini', 'entropy'],
     'max_depth': [None, 10, 20],
     'min_samples_leaf': [1, 4],
+    'max_leaf_nodes': [None, 10, 20, 30]
 }
 
 param_grid_random_forest = {
     'n_estimators': [50, 100],
     'max_depth': [None, 10, 20],
-    'bootstrap': [True]
+    'bootstrap': [True, False]
 }
 
 param_grid_svm = {
     'kernel': ['linear', 'rbf'],
     'C': [0.1, 1],
-    'gamma': ['scale', 'auto']
+    'gamma': ['scale', 'auto'],
+    'shrinking': [True],
+    'tolerance': [1e-3, 1e-4]
 }
 
 # Step 2: Initialize classifiers with random_state=0
@@ -45,8 +54,8 @@ def perform_grid_search(model, X_train, y_train, params):
         param_grid=params,
         scoring=scorer,
         cv=strat_kfold,
-        n_jobs=1,  # Reduced parallelism to avoid memory issues
-        verbose=2  # Increased verbosity to monitor progress
+        n_jobs=1,
+        verbose=2 
     )
     
     # Fit to the data
@@ -57,7 +66,6 @@ def perform_grid_search(model, X_train, y_train, params):
     print("Best parameters are:", best_param)
     print("Best score is:", best_score)
 
-    # Return the fitted grid search objects
     return grid_search, best_param, best_score
 
 # Load data
