@@ -34,17 +34,24 @@ def data_exploration(X, y):
     Output: (n_records, n_subscriber, subscriber_percent) -> Tuple of integers
     """
     # TODO : write your code here
+    print('Y')
+    print(y)
 
     n_records = len(X)
-    n_subscriber = len(X['y' == 'yes'])
+    n_subscriber = y[y['y'] == 'yes'].shape[0]
+
+    print('n_records')
+    print(n_records)
+    print('n_subscriber')
+    print(n_subscriber)
 
     if n_records > 0:
-        subscriber_percent = (n_records/n_subscriber)*100
+        subscriber_percent = (n_subscriber/n_records)*100
     else:
         subscriber_percent = 0
 
     return n_records, n_subscriber, subscriber_percent
-
+ 
 def feature_encoding(X):
     """
     One-hot encode the 'features'.
@@ -52,7 +59,7 @@ def feature_encoding(X):
     Output: X: features_encoded (pd.DataFrame) with shape = (45211, 16)
     """
     non_numerical_columns_names = X.select_dtypes(exclude=['number']).columns
-    # TODO : write encoding here
+
     le = LabelEncoder()
 
     for category_name in non_numerical_columns_names:
@@ -70,8 +77,6 @@ def encode_label(y):
     # TODO : write encoding here
     le = LabelEncoder()
 
-    print('y label')
-    print(y)
     y['y'] = le.fit_transform(y['y'])
 
     return y

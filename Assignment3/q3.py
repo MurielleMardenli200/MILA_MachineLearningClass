@@ -1,38 +1,27 @@
-import numpy as np
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
-from sklearn.metrics import make_scorer, fbeta_score
 from q1 import data_preprocessing
 from q2 import data_splits, normalize_features
 
 # Step 1: Create smaller hyperparameter grids for each model
-
-#  (3 points) Create a dictionary of the specified parameters below for each models with a good range of values. Here are the parameters for each model:
-# 1. Decision-Trees:criterion, max depth, min sample leaf, max leaf nodes
-# 2. Random-Forest: n estimators, max depth, bootstrap
-# 3. SVM: kernel, shrinking, C(Regularization parameter), tolerance, gamma
-
 param_grid_decision_tree = {
     'criterion': ['gini', 'entropy'],
-    'max_depth': [None, 10, 20],
+    'max_depth': [10, 20],
     'min_samples_leaf': [1, 4],
-    'max_leaf_nodes': [None, 10, 20, 30]
 }
 
 param_grid_random_forest = {
     'n_estimators': [50, 100],
-    'max_depth': [None, 10, 20],
+    'max_depth': [10, 20],
     'bootstrap': [True, False]
 }
 
 param_grid_svm = {
-    'kernel': ['linear', 'rbf'],
-    'C': [0.1, 1],
-    'gamma': ['scale', 'auto'],
-    'shrinking': [True],
-    'tolerance': [1e-3, 1e-4]
+    'kernel': ['sigmoid', 'rbf'],
+    'shrinking': [True, False],
+    'C': [0.1, 1]
 }
 
 # Step 2: Initialize classifiers with random_state=0
@@ -41,7 +30,7 @@ random_forest = RandomForestClassifier(random_state=0)
 svm = SVC(random_state=0)
 
 # Step 3: Create a scorer using F-beta score with beta=0.5
-scorer = make_scorer(fbeta_score, beta=0.5)
+scorer = 'accuracy'
 
 # Step 4: Perform grid search for each model using 9-fold StratifiedKFold cross-validation
 def perform_grid_search(model, X_train, y_train, params):
@@ -54,9 +43,11 @@ def perform_grid_search(model, X_train, y_train, params):
         param_grid=params,
         scoring=scorer,
         cv=strat_kfold,
-        n_jobs=1,
-        verbose=2 
+        n_jobs=-1,
+        verbose=2
     )
+    print('y train')
+    print(y_train)
     
     # Fit to the data
     grid_search.fit(X_train, y_train)
@@ -66,10 +57,12 @@ def perform_grid_search(model, X_train, y_train, params):
     print("Best parameters are:", best_param)
     print("Best score is:", best_score)
 
+    # Return the fitted grid search objects
     return grid_search, best_param, best_score
 
 # Load data
 X, y = data_preprocessing()
+
 X_train, X_test, y_train, y_test = data_splits(X, y)
 X_train_scaled, X_test_scaled = normalize_features(X_train, X_test)
 
