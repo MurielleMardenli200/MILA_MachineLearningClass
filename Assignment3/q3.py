@@ -3,36 +3,34 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from q1 import data_preprocessing
-from q2 import data_splits, normalize_features
+from q2 import data_splits, normalize_features, report_model
 
-# Step 1: Create smaller hyperparameter grids for each model
 param_grid_decision_tree = {
     'criterion': ['gini', 'entropy'],
     'max_depth': [10, 20],
-    'min_samples_leaf': [1, 4],
+    'min_samples_leaf': [3, 4, 6],
+    'min_samples_split': [2, 3]
 }
 
 param_grid_random_forest = {
-    'n_estimators': [50, 100],
+    'n_estimators': [50, 70],
     'max_depth': [10, 20],
-    'bootstrap': [True, False]
+    'min_samples_leaf': [3, 4],
+    'bootstrap': [True, False],
 }
 
 param_grid_svm = {
-    'kernel': ['sigmoid', 'rbf'],
+    'kernel': ['rbf', 'poly'],
     'shrinking': [True, False],
-    'C': [0.1, 1]
+    'C': [3, 4]
 }
 
-# Step 2: Initialize classifiers with random_state=0
 decision_tree = DecisionTreeClassifier(random_state=0)
 random_forest = RandomForestClassifier(random_state=0)
 svm = SVC(random_state=0)
 
-# Step 3: Create a scorer using F-beta score with beta=0.5
 scorer = 'accuracy'
 
-# Step 4: Perform grid search for each model using 9-fold StratifiedKFold cross-validation
 def perform_grid_search(model, X_train, y_train, params):
     # Define the cross-validation strategy
     strat_kfold = StratifiedKFold(n_splits=9, shuffle=True, random_state=0)
@@ -46,8 +44,6 @@ def perform_grid_search(model, X_train, y_train, params):
         n_jobs=-1,
         verbose=2
     )
-    print('y train')
-    print(y_train)
     
     # Fit to the data
     grid_search.fit(X_train, y_train)
@@ -60,7 +56,6 @@ def perform_grid_search(model, X_train, y_train, params):
     # Return the fitted grid search objects
     return grid_search, best_param, best_score
 
-# Load data
 X, y = data_preprocessing()
 
 X_train, X_test, y_train, y_test = data_splits(X, y)

@@ -1,7 +1,4 @@
 # Import libraries necessary for this project
-import numpy as np
-import pandas as pd
-from time import time
 from ucimlrepo import fetch_ucirepo
 import sklearn
 from sklearn.preprocessing import MinMaxScaler
@@ -34,16 +31,9 @@ def data_exploration(X, y):
     Output: (n_records, n_subscriber, subscriber_percent) -> Tuple of integers
     """
     # TODO : write your code here
-    print('Y')
-    print(y)
 
     n_records = len(X)
     n_subscriber = y[y['y'] == 'yes'].shape[0]
-
-    print('n_records')
-    print(n_records)
-    print('n_subscriber')
-    print(n_subscriber)
 
     if n_records > 0:
         subscriber_percent = (n_subscriber/n_records)*100
