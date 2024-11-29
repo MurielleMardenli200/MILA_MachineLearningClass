@@ -4,6 +4,7 @@ import numpy as np
 from typing import List, Tuple, Union, Dict, Callable
 from math import sqrt
 from numpy.random import rand
+import torch
 
 ## SET GLOBAL SEED
 ## Do not modify this for reproducibility
@@ -100,8 +101,6 @@ class Dense(Layer):
         self.output_size = output_size
         self.weights = None
         self.bias = None
-        print("input size!!!")
-        print(input_size)
         self.init_weights()
 
     def init_weights(self, weights=None, bias=None):
@@ -119,11 +118,6 @@ class Dense(Layer):
 
         # BEGIN SOLUTION
 
-        print("input size")
-        print(self.input_size)
-        print("input size")
-        print(self.output_size)
-
         # TODO: Check dimensions
         n = 6
         lower, upper = -(sqrt(n / (self.input_size + self.output_size))), (
@@ -132,13 +126,10 @@ class Dense(Layer):
 
         numbers = rand(1000)
         scaled = lower + numbers * (upper - lower)
-        print(scaled.min(), scaled.max())
 
         self.weights = np.zeros(shape=(self.input_size, self.output_size))
         self.weights.fill(np.random.uniform(low=lower, high=upper))
         self.bias = np.zeros(self.output_size)
-        print("weights")
-        print(self.weights)
         # END SOLUTION
 
     def forward(self, x):
@@ -151,6 +142,7 @@ class Dense(Layer):
         """
         # BEGIN SOLUTION
         output = np.dot(x, self.weights) + self.bias
+        self.input = torch.tensor(x, dtype=torch.float32)
         self.output = output
         return output
         # END SOLUTION
@@ -164,17 +156,12 @@ class Dense(Layer):
             input_grad (np.ndarray): gradient of the input of the layer (dx), shape: (batch_size, self.input_size)
         """
         # BEGIN SOLUTION
-        print("output")
-        print(self.output)
-        print(self.output.shape)
-        print("output_grad")
-        print(output_grad)
 
-        self.weights_grad = np.dot(output_grad, self.output) / self.output.shape[0]
+        batch_size = self.input.shape[0]
+
+        self.weights_grad = np.dot(self.input.T, output_grad) / batch_size
         self.bias_grad = np.mean(output_grad, axis=0)
-        print("weights")
-        print(self.weights)
-        input_grad = np.dot(self.weights, output_grad)
+        input_grad = np.dot(output_grad, self.weights.T)
 
         return input_grad
         # END SOLUTION
@@ -291,7 +278,7 @@ class ReLULayer(Layer):
             output (np.ndarray): output of the layer, shape: (batch_size, input_size)
         """
         # BEGIN SOLUTION
-        self.inputs = x  # Store input for backward
+        self.inputs = x
         return np.maximum(0, x)
         # END SOLUTION
 
@@ -304,6 +291,7 @@ class ReLULayer(Layer):
             input_grad (np.ndarray): gradient of the input of the layer (dx), shape: (batch_size, input_size)
         """
         # BEGIN SOLUTION
+
         input_grad = output_grad * (self.inputs > 0).astype(float)
         return input_grad
         # END SOLUTION
@@ -344,9 +332,6 @@ class CrossEntropyLossLayer(Layer):
             output (float): cross entropy loss, averaged over the batch
         """
         # BEGIN SOLUTION
-
-        print("pred")
-        print(prediction)
 
         exp_prediction = np.exp(prediction - np.max(prediction, axis=1, keepdims=True))
         softmax_prediction = exp_prediction / np.sum(
