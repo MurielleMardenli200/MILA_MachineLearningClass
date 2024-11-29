@@ -23,9 +23,13 @@ class Layer:
 
     def __init__(self):
         """
-        Initialize layer parameters (if any) and auxiliary data that is needed for,
-        usually, variables like input_size, output_size, are initialized here.
+        Initialize layer parameters (if any) and auxiliary data.
+        Parameters:
+            input_size (int, optional): Size of the input to the layer.
+            output_size (int, optional): Size of the output from the layer.
         """
+        self.weights = None
+        self.bias = None
 
     def init_weights(self):
         """
@@ -99,8 +103,6 @@ class Dense(Layer):
         super().__init__()
         self.input_size = input_size
         self.output_size = output_size
-        self.weights = None
-        self.bias = None
         self.init_weights()
 
     def init_weights(self, weights=None, bias=None):
@@ -125,10 +127,11 @@ class Dense(Layer):
         )
 
         numbers = rand(1000)
-        scaled = lower + numbers * (upper - lower)
 
-        self.weights = np.zeros(shape=(self.input_size, self.output_size))
-        self.weights.fill(np.random.uniform(low=lower, high=upper))
+        self.weights = np.random.uniform(
+            low=lower, high=upper, size=(self.input_size, self.output_size)
+        )
+
         self.bias = np.zeros(self.output_size)
         # END SOLUTION
 
